@@ -66,7 +66,8 @@ def test_run():
 @patch('firebird.aardvark.chip_specs', ma.chip_specs)
 def test_detect():
     inputs = driver.pyccd_rdd('http://localhost', 'http://localhost',
-                              -100200, 300400, '1980-01-01/2015-12-31')
+                              -100200, 300400, '1980-01-01/2015-12-31', 
+                              specs_func=ma.chip_specs, chips_func=ma.chips)
     results = driver.detect(*inputs[0][0], inputs[0][1], *inputs[0][0])
     assert results['result_ok'] is True
 
@@ -74,7 +75,8 @@ def test_detect():
 @patch('firebird.aardvark.chips', ma.chips)
 @patch('firebird.aardvark.chip_specs', ma.chip_specs)
 def test_detect_ccd_exception():
-    _rdd = driver.pyccd_rdd('http://localhost', 'http://localhost', -100200, 300400, '1980-01-01/2015-12-31')
+    _rdd = driver.pyccd_rdd('http://localhost', 'http://localhost', -100200, 300400, '1980-01-01/2015-12-31',
+                            specs_func=ma.chip_specs, chips_func=ma.chips)
     band_dict = _rdd[0][1]
     band_dict.pop('reds')
     results = driver.detect(111111, 222222, band_dict, 33333, 44444)
@@ -85,7 +87,8 @@ def test_detect_ccd_exception():
 @patch('firebird.aardvark.chip_specs', ma.chip_specs)
 def test_pyccd_rdd():
     inputs = driver.pyccd_rdd('http://localhost', 'http://localhost',
-                              -100200, 300400, '1980-01-01/2015-12-31')
+                              -100200, 300400, '1980-01-01/2015-12-31',
+                              specs_func=ma.chip_specs, chips_func=ma.chips)
     assert len(inputs) == 10000
     assert isinstance(inputs[0], tuple)
     assert isinstance(inputs[0][0], tuple)

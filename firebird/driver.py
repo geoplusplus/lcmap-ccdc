@@ -98,13 +98,15 @@ def csort(chips):
     return tuple(fb.rsort(chips, key=lambda c: c['acquired']))
 
 
-def pyccd_rdd(specs_url, chips_url, x, y, acquired):
+def pyccd_rdd(specs_url, chips_url, x, y, acquired, specs_func=a.chip_specs, chips_func=a.chips):
     """
     :param specs_url: URL to the chip specs host:port/context
     :param chips_url: URL to the chips host:port/context
     :param x: x coodinate contained within the extents of a pyccd rdd (chip)
     :param y: y coodinate contained within the extents of a pyccd rdd (chip)
     :param acquired: Date range string as start/end, ISO 8601 date format
+    :param specs_func: Function used to return spec definitions
+    :param chips_func: Function used to retrieve chip data
     :returns: A tuple of tuples.
     (((x1, y1), {'dates': [],  'reds': [],     'greens': [],
                  'blues': [],  'nirs1': [],    'swir1s': [],
@@ -115,11 +117,11 @@ def pyccd_rdd(specs_url, chips_url, x, y, acquired):
     """
     # create a partial function initialized with x, y and acquired since
     # those are static for this call to pyccd_rdd
-    pchips = partial(a.chips, x=x, y=y, acquired=acquired)
+    pchips = partial(chips_func, x=x, y=y, acquired=acquired)
 
     # get all the specs, ubids, chips, intersecting dates and rods
     # keep track of the spectra they are associated with via dict key 'k'
-    specs = {k: a.chip_specs(v) for k, v in chip_spec_urls(specs_url).items()}
+    specs = {k: specs_func(v) for k, v in chip_spec_urls(specs_url).items()}
 
     ubids = {k: a.ubids(v) for k, v in specs.items()}
 
